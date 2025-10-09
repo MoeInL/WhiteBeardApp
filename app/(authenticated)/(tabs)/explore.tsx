@@ -83,6 +83,10 @@ const Explore = () => {
       setRefreshing(false);
     });
   }, [refetch, search]);
+  const handleClearSearch = useCallback(() => {
+    setSearch("");
+    setCountry(undefined);
+  }, []);
 
   const RenderItem = useCallback(
     ({ item, index }: { item: UniversityType; index: number }) => {
@@ -200,15 +204,13 @@ const Explore = () => {
 
       <Animated.View style={styles.searchContainer} layout={LinearTransition}>
         <SearchInput
+          onClear={handleClearSearch}
           onSearch={(text) => setSearch(text)}
           placeholder="Search universities..."
-          onClear={() => {
-            setSearch("");
-            setCountry(undefined);
-          }}
         />
 
         <DropDown
+          selectedValue={country}
           items={countries || []}
           placeholder="Select a country"
           disabled={countries.length === 0}
