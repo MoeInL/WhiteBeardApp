@@ -54,6 +54,11 @@ const DropDown = ({
   const [selectedItem, setSelectedItem] = useState<DropDownItem | null>(null);
 
   useEffect(() => {
+    if (items.length === 0 || !selectedValue) {
+      setSelectedItem(null);
+      return;
+    }
+
     if (selectedValue !== undefined && selectedValue !== null) {
       const found = items.find((item) => {
         if (typeof item.value === "object" && item.value !== null) {
