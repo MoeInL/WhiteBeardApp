@@ -28,20 +28,6 @@ export default function ParentTabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="favorites"
-        options={{
-          title: "Favorites",
-          tabBarIcon: ({ color, size }) => (
-            <Icon
-              size={size}
-              name="heart"
-              color={color}
-              onPress={() => handleTabPress("favorites")}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="explore"
         options={{
           title: "Explore",
@@ -50,6 +36,21 @@ export default function ParentTabsLayout() {
               size={size}
               color={color}
               name="compass"
+              onPress={() => handleTabPress("favorites")}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          title: "Favorites",
+          tabBarIcon: ({ color, size }) => (
+            <Icon
+              size={size}
+              name="heart"
+              color={color}
               onPress={() => handleTabPress("favorites")}
             />
           ),

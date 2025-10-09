@@ -6,9 +6,14 @@ import { apiClient } from "../axios/interceptor";
 import type { UniversitiesResType } from "./types";
 
 /*** API for get universities ***/
-export const getUniversitiesApi = async (search: string) => {
+export const getUniversitiesApi = async (
+  search: string,
+  offset: number = 0
+) => {
   const [response, error] = await withErrorCatch(
-    apiClient.get<UniversitiesResType>(`/search?name=${search}`)
+    apiClient.get<UniversitiesResType>(
+      `/search?name=${search}&limit=10&offset=${offset}`
+    )
   );
 
   if (error instanceof AxiosError) {

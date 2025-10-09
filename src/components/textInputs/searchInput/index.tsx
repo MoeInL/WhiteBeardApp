@@ -134,12 +134,12 @@ const SearchInput = forwardRef<SearchInputRef, SearchInputProps>(
 
         <TextInput
           ref={inputRef}
-          onFocus={handleFocus}
           onBlur={handleBlur}
           value={searchQuery}
           editable={!onPress}
           autoCapitalize="none"
           autoFocus={autoFocus}
+          onFocus={handleFocus}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.primaryText}
           style={[

@@ -1,40 +1,48 @@
-import { View, StyleSheet, TouchableOpacity, Linking } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
+import { type UniversityType } from "@/src/services";
+
+import { useHandleFavorites } from "@/src/hooks";
+
+import { AnimatedContainer } from "@/src/components/animations";
 import { Text, Icon } from "@/src/components/base";
 import { useTheme } from "@/src/store";
-import { UniversityType } from "@/src/services/universities/types";
 
 type UniversityPreviewProps = {
+  index: number;
+  onPress: () => void;
   university: UniversityType;
-  onPress?: () => void;
 };
 
-const UniversityPreview = ({ university, onPress }: UniversityPreviewProps) => {
+const UniversityPreview = ({
+  university,
+  onPress,
+  index,
+}: UniversityPreviewProps) => {
   /*** Constants ***/
   const { theme } = useTheme();
+  const { isInFavorites, handleToggleFavorite } =
+    useHandleFavorites(university);
 
-  const handleOpenWebsite = () => {
-    const webPage = university.web_pages?.[0];
-    if (webPage) {
-      Linking.openURL(
-        webPage.startsWith("http") ? webPage : `https://${webPage}`
-      );
-    }
+  /*** Handlers ***/
+  const handleFavoritePress = () => {
+    handleToggleFavorite();
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
+    <AnimatedContainer
       onPress={onPress}
+      activeOpacity={0.8}
+      delay={index * 100}
+      animatedStyle="slideLeft"
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors.container,
           borderColor: theme.colors.border,
+          backgroundColor: theme.colors.container,
         },
       ]}
     >
-      {/* University Icon */}
       <View
         style={[
           styles.iconContainer,
@@ -44,9 +52,7 @@ const UniversityPreview = ({ university, onPress }: UniversityPreviewProps) => {
         <Icon size={24} name="school" color={theme.colors.primary} />
       </View>
 
-      {/* University Info */}
       <View style={styles.infoContainer}>
-        {/* University Name */}
         <Text
           size={16}
           numberOfLines={2}
@@ -56,33 +62,27 @@ const UniversityPreview = ({ university, onPress }: UniversityPreviewProps) => {
           {university.name}
         </Text>
 
-        {/* Country */}
         <View style={styles.row}>
           <Icon
             size={14}
             name="map-marker"
             color={theme.colors.secondaryText}
           />
-          <Text
-            size={13}
-            weight="regular"
-            style={styles.countryText}
-            color={theme.colors.secondaryText}
-          >
+
+          <Text size={13} weight="regular" color={theme.colors.secondaryText}>
             {university.country}
           </Text>
         </View>
 
-        {/* Domain */}
         {university.domains?.[0] && (
           <View style={styles.row}>
             <Icon size={14} name="web" color={theme.colors.accent} />
+
             <Text
               size={12}
               family="secondary"
               weight="regular"
               numberOfLines={1}
-              style={styles.domainText}
               color={theme.colors.accent}
             >
               {university.domains[0]}
@@ -91,37 +91,45 @@ const UniversityPreview = ({ university, onPress }: UniversityPreviewProps) => {
         )}
       </View>
 
-      {/* Open Website Button */}
-      <TouchableOpacity
-        activeOpacity={0.6}
-        onPress={handleOpenWebsite}
-        style={styles.websiteButton}
-      >
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={styles.iconButton}
+          onPress={handleFavoritePress}
+        >
+          {isInFavorites ? (
+            <Icon size={24} name="heart" color={theme.colors.error} />
+          ) : (
+            <Icon size={24} name="heart-outline" color={theme.colors.error} />
+          )}
+        </TouchableOpacity>
+
         <Icon size={20} name="open-in-new" color={theme.colors.primary} />
-      </TouchableOpacity>
-    </TouchableOpacity>
+      </View>
+    </AnimatedContainer>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    gap: 12,
+    height: 100,
     borderWidth: 1,
     borderRadius: 12,
-    marginVertical: 6,
-    marginHorizontal: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    // Shadow for elevation
+    paddingHorizontal: 16,
+
+    // IOS Shadows
+    shadowRadius: 3,
     shadowColor: "#000",
+    shadowOpacity: 0.05,
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+
+    // Android Shadows
     elevation: 2,
   },
   iconContainer: {
@@ -132,22 +140,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   infoContainer: {
-    flex: 1,
     gap: 4,
+    flex: 1,
   },
   row: {
+    gap: 4,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
   },
-  countryText: {
-    marginTop: 1,
+  actionsContainer: {
+    gap: 8,
+    flexDirection: "row",
+    alignItems: "center",
   },
-  domainText: {
-    marginTop: 1,
-  },
-  websiteButton: {
-    padding: 8,
+  iconButton: {
+    padding: 4,
   },
 });
 
