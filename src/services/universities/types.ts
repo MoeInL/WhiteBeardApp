@@ -8,4 +8,9 @@ export type UniversityType = {
   "state-province"?: string | null;
 };
 
+export type UniversityReqType = {
+  name: string;
+  country?: string;
+};
+
 export type UniversitiesResType = UniversityType[];

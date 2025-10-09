@@ -70,7 +70,9 @@ const UniversityPreview = ({
           />
 
           <Text size={13} weight="regular" color={theme.colors.secondaryText}>
-            {university.country}
+            {university.country}{" "}
+            {university["state-province"] &&
+              `- ${university["state-province"]}`}
           </Text>
         </View>
 

@@ -1,3 +1,4 @@
+export { default as DropDown, type DropDownItem } from "./dropdown";
 export { default as AwareScrollView } from "./AwareScrollView";
 export { default as Icon, type IconType } from "./icon";
 export { default as Text } from "./text";

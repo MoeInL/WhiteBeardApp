@@ -1,5 +1,7 @@
+import Animated, { LinearTransition } from "react-native-reanimated";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useState } from "react";
+import { Toast } from "toastify-react-native";
 import {
   RefreshControl,
   StyleSheet,
@@ -13,7 +15,7 @@ import { useTheme } from "@/src/store";
 
 import { useAppSafeAreaInsets } from "@/src/hooks";
 
-import { HeaderNavigation, Text, Icon } from "@/src/components/base";
+import { HeaderNavigation, Text, Icon, DropDown } from "@/src/components/base";
 import { SearchInput } from "@/src/components/textInputs";
 import {
   UniversityPreviewSkeleton,
@@ -24,18 +26,40 @@ const Explore = () => {
   /*** States ***/
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [country, setCountry] = useState<string | undefined>(undefined);
 
   /*** Constants ***/
   const { theme } = useTheme();
   const { bottom } = useAppSafeAreaInsets();
   const {
     data,
+    error,
     refetch,
     isLoading,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = UniversityService.useGetUniversities(search);
+  } = UniversityService.useGetUniversities({ name: search, country });
+
+  useEffect(() => {
+    if (error) {
+      Toast.error(error.message);
+    }
+  }, [error]);
+
+  /***** Memoization *****/
+  const countries = useMemo(() => {
+    if (!data) return [];
+
+    const uniqueCountries = Array.from(
+      new Set(data.map((item) => item.country))
+    ).sort();
+
+    return uniqueCountries.map((country) => ({
+      label: country,
+      value: country,
+    }));
+  }, [data]);
 
   const getItemLayout = useCallback(
     (_: unknown, index: number) => ({
@@ -174,29 +198,37 @@ const Explore = () => {
         subtitle="Discover universities from around the world"
       />
 
-      <View style={styles.container}>
+      <Animated.View style={styles.searchContainer} layout={LinearTransition}>
         <SearchInput
           onSearch={(text) => setSearch(text)}
-          placeholder="Search universities by name or country..."
+          placeholder="Search universities..."
+          onClear={() => {
+            setSearch("");
+            setCountry(undefined);
+          }}
         />
 
-        <FlatList
-          data={data || []}
-          renderItem={RenderItem}
-          onEndReachedThreshold={0.5}
-          getItemLayout={getItemLayout}
-          onEndReached={handleLoadMore}
-          showsVerticalScrollIndicator={false}
-          refreshControl={RenderRefreshControl()}
-          ListEmptyComponent={RenderEmptyComponent}
-          ListFooterComponent={RenderFooterComponent}
-          keyExtractor={(item, index) => `${item.name}-${index}`}
-          contentContainerStyle={[
-            styles.listContainer,
-            { paddingBottom: bottom },
-          ]}
+        <DropDown
+          items={countries || []}
+          placeholder="Select a country"
+          disabled={countries.length === 0}
+          onSelect={(item) => setCountry(item.value)}
         />
-      </View>
+      </Animated.View>
+
+      <FlatList
+        data={data || []}
+        renderItem={RenderItem}
+        onEndReachedThreshold={0.5}
+        getItemLayout={getItemLayout}
+        onEndReached={handleLoadMore}
+        showsVerticalScrollIndicator={false}
+        refreshControl={RenderRefreshControl()}
+        ListEmptyComponent={RenderEmptyComponent}
+        ListFooterComponent={RenderFooterComponent}
+        keyExtractor={(item, index) => `${item.name}-${index}`}
+        contentContainerStyle={[styles.container, { paddingBottom: bottom }]}
+      />
     </LinearGradient>
   );
 };
@@ -205,13 +237,17 @@ export default Explore;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    gap: 24,
-    paddingHorizontal: 16,
-  },
-  listContainer: {
     gap: 12,
     flexGrow: 1,
+    paddingHorizontal: 16,
+  },
+  searchContainer: {
+    gap: 16,
+    zIndex: 1000,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
   },
   emptyContainer: {
     flex: 1,

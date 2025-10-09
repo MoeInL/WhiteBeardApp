@@ -134,6 +134,7 @@ const SearchInput = forwardRef<SearchInputRef, SearchInputProps>(
 
         <TextInput
           ref={inputRef}
+          numberOfLines={1}
           onBlur={handleBlur}
           value={searchQuery}
           editable={!onPress}

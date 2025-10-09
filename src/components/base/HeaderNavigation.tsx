@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleContainer: {
-    gap: 8,
     flex: 1,
     justifyContent: "center",
   },

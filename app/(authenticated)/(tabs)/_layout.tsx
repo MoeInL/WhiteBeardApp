@@ -36,7 +36,7 @@ export default function ParentTabsLayout() {
               size={size}
               color={color}
               name="compass"
-              onPress={() => handleTabPress("favorites")}
+              onPress={() => handleTabPress("explore")}
             />
           ),
         }}
